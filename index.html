@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskCadeGame - Gamified To-Do List</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-gamepad"></i>
+                <h1>TaskCadeGame</h1>
+            </div>
+            <nav class="nav">
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <span id="username"></span>
+                    <button class="btn-secondary" onclick="showProfile()">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                    <button class="btn-secondary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn-primary" onclick="window.location.href='auth.html'">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Player Stats -->
+            <div class="stats-panel" id="statsPanel" style="display: none;">
+                <div class="stat-item">
+                    <i class="fas fa-star"></i>
+                    <span>Level <span id="playerLevel">1</span></span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-coins"></i>
+                    <span id="playerPoints">0</span> Points
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">0/100 XP</span>
+                </div>
+            </div>
+
+            <!-- To-Do List Section -->
+            <div class="todo-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-tasks"></i> Your Tasks</h2>
+                    <div class="task-stats">
+                        <span id="completedTasks">0</span> completed today
+                    </div>
+                </div>
+                
+                <div class="add-task-form">
+                    <input type="text" id="taskInput" placeholder="Add a new task..." maxlength="100">
+                    <button onclick="addTask()" class="btn-primary">
+                        <i class="fas fa-plus"></i> Add Task
+                    </button>
+                </div>
+
+                <div class="tasks-container" id="tasksContainer">
+                    <!-- Tasks will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Games Section -->
+            <div class="games-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-gamepad"></i> Mini Games</h2>
+                    <p>Complete tasks to unlock amazing games!</p>
+                </div>
+                
+                <div class="games-grid">
+                    <div class="game-card locked" data-game="snake" data-level="1">
+                        <div class="game-icon">🐍</div>
+                        <h3>Snake Game</h3>
+                        <p>Classic snake game</p>
+                        <div class="unlock-level">Unlocks at Level 1</div>
+                        <button class="btn-game" onclick="playGame('snake')" disabled>
+                            <i class="fas fa-lock"></i> Locked
+                        </button>
+                    </div>
+
+                    <div class="game-card locked" data-game="tictactoe" data-level="2">
+                        <div class="game-icon">⚡</div>
+                        <h3>Tic Tac Toe</h3>
+                        <p>Strategic board game</p>
+                        <div class="unlock-level">Unlocks at Level 2</div>
+                        <button class="btn-game" onclick="playGame('tictactoe')" disabled>
+                            <i class="fas fa-lock"></i> Locked
+                        </button>
+                    </div>
+
+                    <div class="game-card locked" data-game="rockpaperscissors" data-level="3">
+                        <div class="game-icon">✂️</div>
+                        <h3>Rock Paper Scissors</h3>
+                        <p>Beat the computer</p>
+                        <div class="unlock-level">Unlocks at Level 3</div>
+                        <button class="btn-game" onclick="playGame('rockpaperscissors')" disabled>
+                            <i class="fas fa-lock"></i> Locked
+                        </button>
+                    </div>
+
+                    <div class="game-card locked" data-game="flappysquare" data-level="4">
+                        <div class="game-icon">🟦</div>
+                        <h3>Flappy Square</h3>
+                        <p>Navigate through obstacles</p>
+                        <div class="unlock-level">Unlocks at Level 4</div>
+                        <button class="btn-game" onclick="playGame('flappysquare')" disabled>
+                            <i class="fas fa-lock"></i> Locked
+                        </button>
+                    </div>
+
+                    <div class="game-card locked" data-game="memoryflip" data-level="5">
+                        <div class="game-icon">🧠</div>
+                        <h3>Memory Flip</h3>
+                        <p>Test your memory skills</p>
+                        <div class="unlock-level">Unlocks at Level 5</div>
+                        <button class="btn-game" onclick="playGame('memoryflip')" disabled>
+                            <i class="fas fa-lock"></i> Locked
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Game Modal -->
+    <div class="modal" id="gameModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="gameTitle">Game</h3>
+                <button class="close-btn" onclick="closeGameModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="gameContainer">
+                    <!-- Game content will be loaded here -->
+                </div>
+                <div class="game-controls">
+                    <button class="btn-secondary" onclick="restartGame()">
+                        <i class="fas fa-redo"></i> Restart
+                    </button>
+                    <button class="btn-primary" onclick="closeGameModal()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Modal -->
+    <div class="modal" id="celebrationModal">
+        <div class="modal-content celebration">
+            <div class="celebration-content">
+                <div class="celebration-icon">🎉</div>
+                <h2>Congratulations!</h2>
+                <p id="celebrationMessage">Task completed!</p>
+                <div class="rewards">
+                    <div class="reward-item">
+                        <i class="fas fa-star"></i>
+                        <span>+<span id="rewardPoints">10</span> Points</span>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="closeCelebrationModal()">
+                    <i class="fas fa-check"></i> Continue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Player Profile</h3>
+                <button class="close-btn" onclick="closeProfileModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-info">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h2 id="profileUsername">Player</h2>
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-label">Level</span>
+                            <span class="stat-value" id="profileLevel">1</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Total Points</span>
+                            <span class="stat-value" id="profilePoints">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Tasks Completed</span>
+                            <span class="stat-value" id="profileTasksCompleted">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Games Played</span>
+                            <span class="stat-value" id="profileGamesPlayed">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="confetti.js"></script>
+    <script src="games/snake.js"></script>
+    <script src="games/tictactoe.js"></script>
+    <script src="games/rockpaperscissors.js"></script>
+    <script src="games/flappysquare.js"></script>
+    <script src="games/memoryflip.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

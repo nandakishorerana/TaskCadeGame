@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskCadeGame - Profile</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-gamepad"></i>
+                <h1>TaskCadeGame</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="btn-secondary">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-avatar-large">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h1 id="profileUsername">Player</h1>
+                    <p class="profile-subtitle">Gamified Productivity Master</p>
+                </div>
+
+                <div class="profile-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="profileLevel">1</h3>
+                            <p>Current Level</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="profilePoints">0</h3>
+                            <p>Total Points</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="profileTasksCompleted">0</h3>
+                            <p>Tasks Completed</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="profileGamesPlayed">0</h3>
+                            <p>Games Played</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="achievements-section">
+                    <h2><i class="fas fa-trophy"></i> Achievements</h2>
+                    <div class="achievements-grid" id="achievementsGrid">
+                        <!-- Achievements will be rendered here -->
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="btn-primary" onclick="window.location.href='index.html'">
+                        <i class="fas fa-play"></i> Continue Playing
+                    </button>
+                    <button class="btn-secondary" onclick="resetProgress()">
+                        <i class="fas fa-refresh"></i> Reset Progress
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Load and display profile data
+        function loadProfile() {
+            const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const gameData = JSON.parse(localStorage.getItem('gameData') || '{}');
+
+            if (!userData.username) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            document.getElementById('profileUsername').textContent = userData.username;
+            document.getElementById('profileLevel').textContent = gameData.level || 1;
+            document.getElementById('profilePoints').textContent = gameData.points || 0;
+            document.getElementById('profileTasksCompleted').textContent = gameData.tasksCompleted || 0;
+            document.getElementById('profileGamesPlayed').textContent = gameData.gamesPlayed || 0;
+
+            loadAchievements();
+        }
+
+        function loadAchievements() {
+            const gameData = JSON.parse(localStorage.getItem('gameData') || '{}');
+            const achievementsGrid = document.getElementById('achievementsGrid');
+            
+            const achievements = [
+                { id: 'first_task', name: 'First Steps', description: 'Complete your first task', icon: 'fa-star', unlocked: (gameData.tasksCompleted || 0) >= 1 },
+                { id: 'task_master', name: 'Task Master', description: 'Complete 10 tasks', icon: 'fa-tasks', unlocked: (gameData.tasksCompleted || 0) >= 10 },
+                { id: 'game_explorer', name: 'Game Explorer', description: 'Play your first game', icon: 'fa-gamepad', unlocked: (gameData.gamesPlayed || 0) >= 1 },
+                { id: 'level_up', name: 'Level Up!', description: 'Reach level 5', icon: 'fa-arrow-up', unlocked: (gameData.level || 1) >= 5 },
+                { id: 'point_collector', name: 'Point Collector', description: 'Earn 500 points', icon: 'fa-coins', unlocked: (gameData.points || 0) >= 500 }
+            ];
+
+            achievementsGrid.innerHTML = achievements.map(achievement => `
+                <div class="achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}">
+                    <div class="achievement-icon">
+                        <i class="fas ${achievement.icon}"></i>
+                    </div>
+                    <h3>${achievement.name}</h3>
+                    <p>${achievement.description}</p>
+                    ${achievement.unlocked ? '<div class="achievement-badge">Unlocked!</div>' : '<div class="achievement-lock"><i class="fas fa-lock"></i></div>'}
+                </div>
+            `).join('');
+        }
+
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all your progress? This action cannot be undone.')) {
+                localStorage.removeItem('gameData');
+                localStorage.removeItem('tasks');
+                alert('Progress reset successfully!');
+                loadProfile();
+            }
+        }
+
+        // Load profile when page loads
+        window.onload = loadProfile;
+    </script>
+</body>
+</html>
